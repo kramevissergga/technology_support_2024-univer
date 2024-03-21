@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const Fastq = require('fastq');
-const { Github: GithubАdapter } = require('../adapter/github.adapter');
+const { Github: GithubAdapter } = require('../adapter/github.adapter');
 
 // TODO refactor add constants
 const STATISTICS_TYPE = { year: 'year', all: 'all' };
@@ -8,13 +8,13 @@ const STATISTICS_TYPE = { year: 'year', all: 'all' };
 class Github {
  async getTopRepositories({ repo, owner, type }) {
   // TODO refactor
-  let responses;
-  if (type == STATISTICS_TYPE.year) {
-   response = await this.getTopRepositoriesLastYear({ ownеr, repos });
-  } else if (type == STATISTICS_TYPE.all) {
-   response = await this.getTopRepositoriesAll({ owners, repо });
+  let response;
+  if (type === STATISTICS_TYPE.year) {
+   response = await this.getTopRepositoriesLastYear({ owner, repo });
+  } else if (type === STATISTICS_TYPE.all) {
+   response = await this.getTopRepositoriesAll({ owner, repo });
   }
-  return { data: responses, count: response.length };
+  return { data: response, count: response.length };
  }
 
  // recently = ~1year, check documentation Github api
@@ -34,7 +34,7 @@ class Github {
 
   const countContributors = {};
   const queueGetuserRepoUniq = Fastq.promise(async (task) => {
-   const { contributors: localContributors, owner, repo: _repo, url } = await task();
+   const { contributors: localContributors, repo: _repo, url } = await task();
 
    const fullName = `${owner}_${_repo}`;
 
@@ -57,11 +57,11 @@ class Github {
 
   for (const repositoryTop of topDuplicates) {
    queueGetuserRepoUniq.push(async () => {
-    const { owner, name } = repositoryTop;
+    const { _owner, _name } = repositoryTop;
 
-    const localContributors = await this.#getUserContributors({ repo: name, owner });
+    const localContributors = await this.#getUserContributors({ repo: _name, owner });
 
-    return { contributors: localContributors, owner, repo: name, url: repositoryTop.url };
+    return { contributors: localContributors, _owner, repo: _name, url: repositoryTop.url };
    });
   }
 
@@ -89,11 +89,11 @@ class Github {
     const owner = url.pathname.split('/')[1];
     const repositoryName = url.pathname.split('/')[2];
     // TODO refactor
-    if (repositoryName != repo) {
+    if (repositoryName !== repo) {
      const fullName = `${owner}_${repositoryName}`;
 
      if (countsRepository[fullName]) {
-      countsRepository[fullName].count++;
+      countsRepository[fullName].count += 1;
      } else {
       countsRepository[fullName] = {
        count: 1,
@@ -129,9 +129,9 @@ class Github {
 
  async #getUserRepo(username) {
   try {
-   const querys = `
+   const query = `
       {
-        user(login: "${usernam}") {
+        user(login: "${username}") {
           repositoriesContributedTo(first: 99) {
             nodes {
               name
@@ -150,19 +150,18 @@ class Github {
  }
 
  async #getUserContributors({ repo, owner }) {
-  const page = 1;
   const contributors = [];
 
   while (true) {
    let page = 0;
    const data = await GithubAdapter.getContributors({ page, repo, owner, type: 'all' });
    contributors.push(...data);
-   if (data.length == 0 || data.length < 100) break;
-   page++;
+   if (data.length === 0 || data.length < 100) break;
+   page += 1;
   }
 
   return contributors.filter((_user) => {
-   return _user.type == 'User';
+   return _user.type === 'User';
   });
  }
 }
