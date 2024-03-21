@@ -2,7 +2,7 @@
   "name": "technology_support_2024-univer",
   "version": "1.0.0",
   "description": "looking for top collaborators",
-  "main": "index.html",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,8 +10,8 @@
   "license": "ISC",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint": "eslint .js",
+    "lint:fix": "eslint .js --fix"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.1.0",
