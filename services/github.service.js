@@ -10,9 +10,9 @@ class Github {
  async getTopRepositories({ repo, owner, type }) {
   // TODO refactor
   let response;
-  if (type == STATISTICS_TYPE.year) {
+  if (type === STATISTICS_TYPE.year) {
    response = await this.getTopRepositoriesLastYear({ owner, repo });
-  } else if (type == STATISTICS_TYPE.all) {
+  } else if (type === STATISTICS_TYPE.all) {
    response = await this.getTopRepositoriesAll({ owner, repo });
   }
   return { data: response, count: response.length };
@@ -43,7 +43,7 @@ class Github {
 
    localContributors.forEach((obj) => {
     const { login } = obj;
-    if (contributors.some((objData) => objData.login == login)) {
+    if (contributors.some((objData) => objData.login === login)) {
      if (countContributors[fullName]) {
       countContributors[fullName].count += 1;
      } else {
@@ -92,11 +92,11 @@ class Github {
     const owner = url.pathname.split('/')[1];
     const repositoryName = url.pathname.split('/')[2];
     // TODO refactor
-    if (repositoryName != repo) {
+    if (repositoryName !== repo) {
      const fullName = `${owner}_${repositoryName}`;
 
      if (countsRepository[fullName]) {
-      countsRepository[fullName].count++;
+      countsRepository[fullName].count += 1;
      } else {
       countsRepository[fullName] = {
        count: 1,
@@ -151,6 +151,7 @@ class Github {
    throw new Error(`Failed to fetch repositories for ${username}: ${error.message}`);
   }
  }
+
  async #getUserContributors({ repo, owner }) {
   let page = 1;
   const contributors = [];
@@ -158,12 +159,12 @@ class Github {
   while (true) {
    const data = await GithubAdapter.getContributors({ page, repo, owner, type: 'all' });
    contributors.push(...data);
-   if (data.length == 0 || data.length < 100) break;
-   page++;
+   if (data.length === 0 || data.length < 100) break;
+   page += 1;
   }
 
   return contributors.filter((_user) => {
-   return _user.type == 'User';
+   return _user.type === 'User';
   });
  }
 }
