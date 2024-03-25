@@ -3,7 +3,7 @@ name: ESLint
 on:
   push:
     branches:
-      - main # Вкажіть тут назву вашої гілки
+      - modul_1_matseha 
 
 jobs:
   eslint:
